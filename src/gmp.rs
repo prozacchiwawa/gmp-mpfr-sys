@@ -39,7 +39,7 @@ unsafe {
 */
 #![allow(non_camel_case_types)]
 
-use libc::FILE;
+// use libc::FILE;
 use misc;
 use std::os::raw::{c_char, c_int, c_long, c_uchar, c_uint, c_ulong, c_ushort, c_void};
 
@@ -710,17 +710,17 @@ extern "C" {
     // Input and Ouput Functions
 
     /// See: [`mpz_out_str`](https://tspiteri.gitlab.io/gmp-mpfr-sys/gmp/Integer-Functions.html#index-mpz_005fout_005fstr)
-    #[link_name = "__gmpz_out_str"]
-    pub fn mpz_out_str(stream: *mut FILE, base: c_int, op: mpz_srcptr) -> usize;
+    //#[link_name = "__gmpz_out_str"]
+    //pub fn mpz_out_str(stream: *mut FILE, base: c_int, op: mpz_srcptr) -> usize;
     /// See: [`mpz_inp_str`](https://tspiteri.gitlab.io/gmp-mpfr-sys/gmp/Integer-Functions.html#index-mpz_005finp_005fstr)
-    #[link_name = "__gmpz_inp_str"]
-    pub fn mpz_inp_str(rop: mpz_ptr, stream: *mut FILE, base: c_int) -> usize;
+    //#[link_name = "__gmpz_inp_str"]
+    //pub fn mpz_inp_str(rop: mpz_ptr, stream: *mut FILE, base: c_int) -> usize;
     /// See: [`mpz_out_raw`](https://tspiteri.gitlab.io/gmp-mpfr-sys/gmp/Integer-Functions.html#index-mpz_005fout_005fraw)
-    #[link_name = "__gmpz_out_raw"]
-    pub fn mpz_out_raw(stream: *mut FILE, op: mpz_srcptr) -> usize;
+    //#[link_name = "__gmpz_out_raw"]
+    //pub fn mpz_out_raw(stream: *mut FILE, op: mpz_srcptr) -> usize;
     /// See: [`mpz_inp_raw`](https://tspiteri.gitlab.io/gmp-mpfr-sys/gmp/Integer-Functions.html#index-mpz_005finp_005fraw)
-    #[link_name = "__gmpz_inp_raw"]
-    pub fn mpz_inp_raw(rop: mpz_ptr, stream: *mut FILE) -> usize;
+    //#[link_name = "__gmpz_inp_raw"]
+    //pub fn mpz_inp_raw(rop: mpz_ptr, stream: *mut FILE) -> usize;
 
     // Random Number Functions
 
@@ -1052,12 +1052,14 @@ extern "C" {
 
     // Input and Output Functions
 
+    /*
     /// See: [`mpq_out_str`](https://tspiteri.gitlab.io/gmp-mpfr-sys/gmp/Rational-Number-Functions.html#index-mpq_005fout_005fstr)
     #[link_name = "__gmpq_out_str"]
     pub fn mpq_out_str(stream: *mut FILE, base: c_int, op: mpq_srcptr) -> usize;
     /// See: [`mpq_inp_str`](https://tspiteri.gitlab.io/gmp-mpfr-sys/gmp/Rational-Number-Functions.html#index-mpq_005finp_005fstr)
     #[link_name = "__gmpq_inp_str"]
     pub fn mpq_inp_str(rop: mpq_ptr, stream: *mut FILE, base: c_int) -> usize;
+    */
 }
 
 // Floating-point numbers
@@ -1259,11 +1261,11 @@ pub unsafe extern "C" fn mpf_sgn(op: mpf_srcptr) -> c_int {
 
 extern "C" {
     /// See: [`mpf_out_str`](https://tspiteri.gitlab.io/gmp-mpfr-sys/gmp/Floating_002dpoint-Functions.html#index-mpf_005fout_005fstr)
-    #[link_name = "__gmpf_out_str"]
-    pub fn mpf_out_str(stream: *mut FILE, base: c_int, n_digits: usize, op: mpf_srcptr) -> usize;
+    //#[link_name = "__gmpf_out_str"]
+    //pub fn mpf_out_str(stream: *mut FILE, base: c_int, n_digits: usize, op: mpf_srcptr) -> usize;
     /// See: [`mpf_inp_str`](https://tspiteri.gitlab.io/gmp-mpfr-sys/gmp/Floating_002dpoint-Functions.html#index-mpf_005finp_005fstr)
-    #[link_name = "__gmpf_inp_str"]
-    pub fn mpf_inp_str(rop: mpf_ptr, stream: *mut FILE, base: c_int) -> usize;
+    //#[link_name = "__gmpf_inp_str"]
+    //pub fn mpf_inp_str(rop: mpf_ptr, stream: *mut FILE, base: c_int) -> usize;
 
     // Miscellaneous Functions
 
@@ -1656,8 +1658,8 @@ extern "C" {
     #[link_name = "__gmp_printf"]
     pub fn printf(fmt: *const c_char, ...) -> c_int;
     /// See: [`gmp_fprintf`](https://tspiteri.gitlab.io/gmp-mpfr-sys/gmp/Formatted-Output.html#index-gmp_005ffprintf)
-    #[link_name = "__gmp_fprintf"]
-    pub fn fprintf(fp: *mut FILE, fmt: *const c_char, ...) -> c_int;
+    //#[link_name = "__gmp_fprintf"]
+    //pub fn fprintf(fp: *mut FILE, fmt: *const c_char, ...) -> c_int;
     /// See: [`gmp_sprintf`](https://tspiteri.gitlab.io/gmp-mpfr-sys/gmp/Formatted-Output.html#index-gmp_005fsprintf)
     #[link_name = "__gmp_sprintf"]
     pub fn sprintf(buf: *mut c_char, fmt: *const c_char, ...) -> c_int;
@@ -1676,8 +1678,8 @@ extern "C" {
     #[link_name = "__gmp_scanf"]
     pub fn scanf(fmt: *const c_char, ...) -> c_int;
     /// See: [`gmp_fscanf`](https://tspiteri.gitlab.io/gmp-mpfr-sys/gmp/Formatted-Input.html#index-gmp_005ffscanf)
-    #[link_name = "__gmp_fscanf"]
-    pub fn fscanf(fp: *mut FILE, fmt: *const c_char, ...) -> c_int;
+    //#[link_name = "__gmp_fscanf"]
+    //pub fn fscanf(fp: *mut FILE, fmt: *const c_char, ...) -> c_int;
     /// See: [`gmp_sscanf`](https://tspiteri.gitlab.io/gmp-mpfr-sys/gmp/Formatted-Input.html#index-gmp_005fsscanf)
     #[link_name = "__gmp_sscanf"]
     pub fn sscanf(s: *const c_char, fmt: *const c_char, ...) -> c_int;

@@ -39,6 +39,7 @@ const MPC_DIR: &'static str = "mpc-1.1.0-c";
 enum Target {
     Mingw,
     Msvc,
+    Wasm,
     Other,
 }
 
@@ -57,7 +58,7 @@ struct Environment {
     newer_cache: bool,
     cc: String,
     cflags: String,
-    host: String,
+    host: String
 }
 
 #[derive(Clone, Copy, PartialEq)]
@@ -92,6 +93,8 @@ fn main() {
     //Target::Msvc
     } else if target.contains("-windows-gnu") {
         Target::Mingw
+    } else if target.contains("wasm") {
+        Target::Wasm
     } else {
         Target::Other
     };
@@ -145,7 +148,7 @@ fn main() {
         newer_cache: false,
         cc,
         cflags,
-        host,
+        host
     };
     env.check_feature("maybe_uninit", TRY_MAYBE_UNINIT, Some("maybe_uninit"));
 
@@ -170,13 +173,26 @@ fn main() {
         None
     };
 
-    let (compile_gmp, compile_mpfr, compile_mpc) =
+    let (compile_gmp, mut compile_mpfr, mut compile_mpc) =
         need_compile(&mut env, &gmp_ah, &mpfr_ah, &mpc_ah);
+
+    let gmp_dir =
+        if env.target != Target::Wasm {
+            GMP_DIR
+        } else {
+            "gmp-wasm"
+        };
+
+    if env.target == Target::Wasm {
+        compile_mpfr = false;
+        compile_mpc = false;
+    }
+
     if compile_gmp {
         check_for_msvc(&env);
         remove_dir_or_panic(&env.build_dir);
         create_dir_or_panic(&env.build_dir);
-        link_dir(&src_dir.join(GMP_DIR), &env.build_dir.join("gmp-src"));
+        link_dir(&src_dir.join(gmp_dir), &env.build_dir.join("gmp-src"));
         let (ref a, ref h) = gmp_ah;
         build_gmp(&env, a, h);
     }
@@ -469,22 +485,33 @@ fn build_gmp(env: &Environment, lib: &Path, header: &Path) {
     println!("$ cd {:?}", build_dir);
     println!("$ export CC={:?}", &env.cc);
     println!("$ export CFLAGS={:?}", &env.cflags);
-    let conf = format!(
-        "../gmp-src/configure \
-         --host={} \
-         --enable-fat \
-         --disable-shared \
-         --with-pic \
-         ",
-        &env.host
-    );
+    let conf =
+        if env.target != Target::Wasm {
+            format!(
+                "../gmp-src/configure \
+                 --host={} \
+                 --enable-fat \
+                 --disable-shared \
+                 --with-pic \
+                 ",
+                &env.host
+            )
+        } else {
+            "sed -e 's/found_asm=yes/found_asm=no/g' < ../gmp-src/configure > ../gmp-src/configure.p && sed -e 's/ check-recursive / /g' < ../gmp-src/Makefile.in > ../gmp-src/Makefile.in.new && (echo && echo check-recursive: && echo) >> ../gmp-src/Makefile.in.new && mv ../gmp-src/Makefile.in.new ../gmp-src/Makefile.in && chmod +x ../gmp-src/configure.p && emconfigure ../gmp-src/configure.p --disable-assembly".to_string()
+        };
+
     let mut configure = Command::new("sh");
     configure
         .current_dir(&build_dir)
         .arg("-c")
-        .arg(conf)
-        .env("CC", &env.cc)
-        .env("CFLAGS", &env.cflags);
+        .arg(conf);
+
+    if env.target != Target::Wasm {
+        configure 
+            .env("CC", &env.cc)
+            .env("CFLAGS", &env.cflags);
+    }
+
     execute(configure);
     make_and_check(env, &build_dir);
     let build_lib = build_dir.join(".libs").join("libgmp.a");
